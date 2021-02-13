@@ -4,7 +4,9 @@ OpenAI Gym compatible environment for the Parrot Drone ANAFI 4K for training rei
 
 ## Description
 
-'''parrotenv.py''' script contains the Gym.Env inherited class for the parrot drone.
+```parrotenv.py``` script contains the Gym.Env inherited class for the parrot drone. Modify the reward function as per goal task for drone. This script is designed for drone waypoint tracking with shortest distance.
+```parrot_training.py``` script trains the drone in Sphinx simulation for goal task using Stable Baseline algorithms and saves your best trained model.
+```parrot_predict.py``` script evaluates the saved model on the drone in Sphinx simulation.
 
 
 
