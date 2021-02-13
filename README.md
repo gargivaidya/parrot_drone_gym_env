@@ -40,7 +40,7 @@ pwd
 
 ```
 ## Training
-Spawn the drone model in the desired world and run the training script.
+Luanch simulation and spawn the drone model in the desired world. Run the training script. </br>
 `sphinx <path/to/my.world> <path/to/my.drone>` </br>
 
 `sphinx /opt/parrot-sphinx/usr/share/sphinx/drones/virt_anafi4k.drone ` </br>
@@ -49,7 +49,7 @@ In a separate terminal - </br>
 python parrot_training.env`
 
 ## Evaluation
-Spawn the drone model in the desired world and run the evaluation script.
+Launch the simulation Spawn the drone model in the desired world. Run the evaluation script. </br>
 `sphinx <path/to/my.world> <path/to/my.drone>` </br>
 
 `sphinx /opt/parrot-sphinx/usr/share/sphinx/drones/virt_anafi4k.drone ` </br>
