@@ -13,17 +13,15 @@ OpenAI Gym compatible environment for the Parrot Drone ANAFI 4K for training rei
 This script needs Parrot-Sphinx and Olympe on Ubuntu 18.04.
 ### Parrot-Sphinx
 Parrot-Sphinx Documentation - https://developer.parrot.com/docs/sphinx/whatissphinx.html
-'''
-echo "deb http://plf.parrot.com/sphinx/binary `lsb_release -cs`/" | sudo tee /etc/apt/sources.list.d/sphinx.list > /dev/null
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 508B1AE5
+``` echo "deb http://plf.parrot.com/sphinx/binary `lsb_release -cs`/" | sudo tee /etc/apt/sources.list.d/sphinx.list > /dev/null ``` </br>
+```sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 508B1AE5 ``` </br>
 
-sudo apt update
-sudo apt install parrot-sphinx
-'''
+``` sudo apt update ``` </br>
+``` sudo apt install parrot-sphinx ``` </br>
 ### Olympe
 Olympe Documentation - https://developer.parrot.com/docs/olympe/overview.html
 
-'''
+```
 cd $HOME
 mkdir -p code/parrot-groundsdk
 cd code/parrot-groundsdk
@@ -34,7 +32,7 @@ repo sync
 pwd
 ./products/olympe/linux/env/postinst
 
-'''
+```
 
 
 
