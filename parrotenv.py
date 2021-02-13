@@ -152,14 +152,12 @@ class ParrotEnv(gym.Env):
     if z>5:
       z_act = min(0,action[2])
 
-    self.drone(PCMD(1, y_act, x_act, 0, z_act, timestampAndSeqNum=0, _timeout=10)>> FlyingStateChanged(state="hovering", _timeout=5)).wait()
-    
-  
+    self.drone(PCMD(1, y_act, x_act, 0, z_act, timestampAndSeqNum=0, _timeout=10)>> FlyingStateChanged(state="hovering", _timeout=5)).wait() 
     self.pos_feedback() # Update state of the drone in self.agent_pos
     obs = [self.agent_pos[0]-self.destination[0],self.agent_pos[1]-self.destination[1],self.agent_pos[2]-self.destination[2]]
     d = self.distance([obs[0],obs[1],obs[2]])
 
-    #Terminating Condition
+    #Terminating Condition and reward design
     done = bool(d < 0.5)
     if bool(d < 0.5):
       reward = +100   
