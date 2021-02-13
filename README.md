@@ -59,7 +59,7 @@ python parrot_predict.env`
 
 ## Disable drone battery in simulation
 
-In a new bash terminal -
+In a new bash terminal - </br>
 `echo '{"jsonrpc": "2.0", "method": "SetParam", "params": {"machine":"anafi4k", "object":"lipobattery/lipobattery", "parameter":"discharge_speed_factor", "value":"0"}, "id": 1}' | curl -d @- http://localhost:8383 | python -m json.tool`
 
 
