@@ -13,11 +13,16 @@ OpenAI Gym compatible environment for the Parrot Drone ANAFI 4K for training rei
 This script needs Parrot-Sphinx and Olympe on Ubuntu 18.04.
 ### Parrot-Sphinx
 Parrot-Sphinx Documentation - https://developer.parrot.com/docs/sphinx/whatissphinx.html
-``` echo "deb http://plf.parrot.com/sphinx/binary `lsb_release -cs`/" | sudo tee /etc/apt/sources.list.d/sphinx.list > /dev/null ``` </br>
-```sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 508B1AE5 ``` </br>
+``` 
+echo "deb http://plf.parrot.com/sphinx/binary `lsb_release -cs`/" | sudo tee /etc/apt/sources.list.d/sphinx.list > /dev/null 
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 508B1AE5
 
-``` sudo apt update ``` </br>
-``` sudo apt install parrot-sphinx ``` </br>
+sudo apt update 
+sudo apt install parrot-sphinx
+
+sudo systemctl start firmwared.service
+```
+
 ### Olympe
 Olympe Documentation - https://developer.parrot.com/docs/olympe/overview.html
 
@@ -33,6 +38,28 @@ pwd
 ./products/olympe/linux/env/postinst
 
 ```
+## Training
+Spawn the drone model in the desired world and run the training script.
+`sphinx <path/to/my.world> <path/to/my.drone>`
+
+`sphinx /opt/parrot-sphinx/usr/share/sphinx/drones/virt_anafi4k.drone `
+In a separate terminal -
+`source ~/code/parrot-groundsdk/./products/olympe/linux/env/shell
+python parrot_training.env`
+
+## Evaluation
+Spawn the drone model in the desired world and run the evaluation script.
+`sphinx <path/to/my.world> <path/to/my.drone>`
+
+`sphinx /opt/parrot-sphinx/usr/share/sphinx/drones/virt_anafi4k.drone `
+In a separate terminal -
+`source ~/code/parrot-groundsdk/./products/olympe/linux/env/shell
+python parrot_predict.env`
+
+## Disable drone battery in simulation
+
+In a new bash terminal -
+`echo '{"jsonrpc": "2.0", "method": "SetParam", "params": {"machine":"anafi4k", "object":"lipobattery/lipobattery", "parameter":"discharge_speed_factor", "value":"0"}, "id": 1}' | curl -d @- http://localhost:8383 | python -m json.tool`
 
 
 
