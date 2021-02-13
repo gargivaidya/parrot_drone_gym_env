@@ -34,25 +34,26 @@ pwd
 repo init -u https://github.com/Parrot-Developers/groundsdk-manifest.git
 repo sync
 
+cd code/parrot-groundsdk
 pwd
 ./products/olympe/linux/env/postinst
 
 ```
 ## Training
 Spawn the drone model in the desired world and run the training script.
-`sphinx <path/to/my.world> <path/to/my.drone>`
+`sphinx <path/to/my.world> <path/to/my.drone>` </br>
 
-`sphinx /opt/parrot-sphinx/usr/share/sphinx/drones/virt_anafi4k.drone `
-In a separate terminal -
+`sphinx /opt/parrot-sphinx/usr/share/sphinx/drones/virt_anafi4k.drone ` </br>
+In a separate terminal - </br>
 `source ~/code/parrot-groundsdk/./products/olympe/linux/env/shell
 python parrot_training.env`
 
 ## Evaluation
 Spawn the drone model in the desired world and run the evaluation script.
-`sphinx <path/to/my.world> <path/to/my.drone>`
+`sphinx <path/to/my.world> <path/to/my.drone>` </br>
 
-`sphinx /opt/parrot-sphinx/usr/share/sphinx/drones/virt_anafi4k.drone `
-In a separate terminal -
+`sphinx /opt/parrot-sphinx/usr/share/sphinx/drones/virt_anafi4k.drone ` </br>
+In a separate terminal - </br>
 `source ~/code/parrot-groundsdk/./products/olympe/linux/env/shell
 python parrot_predict.env`
 
