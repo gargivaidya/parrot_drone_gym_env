@@ -10,7 +10,7 @@ OpenAI Gym compatible environment for the Parrot Drone ANAFI 4K for training rei
 ```parrot_predict.py``` script evaluates the saved model on the drone in Sphinx simulation. </br>
 
 ## Installation Setup
-This script needs Parrot-Sphinx and Olympe on Ubuntu 18.04.
+This script needs Parrot-Sphinx and Olympe on Ubuntu 18.04. No ROS installation required.
 ### Parrot-Sphinx
 Parrot-Sphinx Documentation - https://developer.parrot.com/docs/sphinx/whatissphinx.html
 ``` 
