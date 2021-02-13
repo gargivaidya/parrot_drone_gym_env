@@ -1,7 +1,7 @@
 """
 Benchmark reinforcement learning (RL) algorithms from Stable Baselines 2.10.
 Author: Gargi Vaidya & Vishnu Saj
-- Note : Modify the RL algorithm from StableBaselines and tune the hyperparameters.
+- Note : Modify the RL algorithm from StableBaselines and tune the hyperparameters for best reward performance.
 
 """
 import olympe
@@ -74,6 +74,7 @@ import csv
                   self.model.save(self.save_path)
 
         return True
+
 # Stores a csv file for the episode reward       
 heading = ["Timestep", "Reward"]
 with    open('reward.csv', 'w', newline='') as csvFile:
@@ -89,6 +90,7 @@ env = ParrotEnv(destination = [0,0,1], drone= drone)
 #env.reset()
 env = Monitor(env, log_dir)
 
+# Train the RL algorithm
 model = TD3(MlpPolicy, env, verbose=1, learning_rate = 0.0005,tensorboard_log="./td3_parrot_tensorboard/", buffer_size = 25000)
 callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
 model.learn(total_timesteps=30000, log_interval=10,tb_log_name = "td3_run_3d", callback = callback)
