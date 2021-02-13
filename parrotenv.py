@@ -1,5 +1,9 @@
-# Continuous Action Parrot Drone Environment 3D Space
+"""
+Benchmark reinforcement learning (RL) algorithms from Stable Baselines 2.10.
+Author: Gargi Vaidya & Vishnu Saj
+- Note : Modify the state & action space as well as reward function for specific goal.
 
+"""
 import gym
 import numpy as np
 import random
@@ -7,15 +11,12 @@ import math
 import csv
 from gym import spaces
 from stable_baselines.common.env_checker import check_env
-from matplotlib import pyplot as plt
-
 from subprocess import PIPE, Popen
 from threading  import Thread
 import sys
 import numpy as np
 import re
 from queue import Queue, Empty, LifoQueue
-
 import olympe
 from olympe.messages.ardrone3.Piloting import TakeOff, moveBy, Landing,moveTo, PCMD
 from olympe.messages.ardrone3.PilotingState import FlyingStateChanged, AttitudeChanged, moveByChanged, AltitudeChanged, GpsLocationChanged
@@ -28,13 +29,12 @@ class ParrotEnv(gym.Env):
     super(ParrotEnv, self).__init__()
     self.destination = destination
     self.drone = drone
-    #n_actions = 4
-    #self.reward = 0
     self.counter = 0
     self.q1 = LifoQueue()
     self.q2 = LifoQueue()
     self.agent_pos = [0,0,0]
-    # Run the command
+
+    # Run the command for subscribing to the gazebo topic.
     ON_POSIX = 'posix' in sys.builtin_module_names
     command1 = "parrot-gz topic -e /gazebo/default/pose/info | grep  -A 5 'name: \"anafi4k\"'"
     command2 = "tlm-data-logger inet:127.0.0.1:9060"
@@ -56,7 +56,6 @@ class ParrotEnv(gym.Env):
 
 
   # Process the output from the file
-
   def process_output1(self,out, queue):
     for line1 in iter(out.readline, b''):
       line1 = str(line1)
@@ -72,6 +71,7 @@ class ParrotEnv(gym.Env):
       queue.put(line1)
     out.close()
   """
+  # Includes the drone velocities in state
   def process_output2(self,out, queue):
     for line2 in iter(out.readline, b''):
       line2 = str(line2)
@@ -97,36 +97,39 @@ class ParrotEnv(gym.Env):
         # Clear out the queue
         self.q1.queue.clear()
         #self.q2.queue.clear()
-    #print("\n============================================================")
-    #print("\nPosition: {}, {}, {}".format(self.pos1[0], self.pos1[1], self.pos1[2]))
-    #print("\n===============timestampAndSeqNum=0, _timeout=10=============================================")
-
-    #print("\n=========================System Exiting")
-    #return self.pos1
-
-
 
   def distance(self,a):
+    # Calculates absolute distance from origin coordinate
     return math.sqrt(a[0]**2+a[1]**2+a[2]**2)
 
   def reset(self):
-    self.pos_feedback()
-    #a=self.drone.get_state(AttitudeChanged)['yaw']
-    #self.drone(moveBy(0, 0, 0, 1.57-a)>> FlyingStateChanged(state="hovering", _timeout=5)).wait()
+    # Resets the drone back to start of simulation after completion of episode
+    self.pos_feedback() # Update state of the drone in self.agent_pos
+
+    # Random initialization(reset) for every episode
     x_r = random.randrange(-5,5,1)
     y_r = random.randrange(-5,5,1)
     z_r = random.randrange(1,5,1)
+
+    # Random goal setting for every episode
     x_d = random.randrange(-5,5,1)
     y_d = random.randrange(-5,5,1)
     z_d = random.randrange(1,5,1)
+
     self.destination = [x_d,y_d,z_d]
-    print('-----------------init-------------------',[x_r,y_r,z_r],'--------------------------init-----------------------------')
-    print('-----------------dest-------------------',self.destination,'--------------------------dest-----------------------------')
+
+    print('------------RESET-------------',[x_r,y_r,z_r],'------------RESET-------------')
+    print('------------GOAL-------------',self.destination,'------------GOAL-------------')
+
+    # Move the drone to random initialization coordinate
     self.drone(moveBy(x_r-self.agent_pos[0], self.agent_pos[1]-y_r, self.agent_pos[2]-z_r, 0)>> FlyingStateChanged(state="hovering", _timeout=5)).wait()
-    self.pos_feedback()
+    self.pos_feedback() # Update state of the drone in self.agent_pos
     obs = [self.agent_pos[0]-self.destination[0],self.agent_pos[1]-self.destination[1], self.agent_pos[2]-self.destination[2]]
     return np.array(obs).astype(np.float32)  # reward, done, info can't be included
+
+
   def step(self, action):
+    # Takes action within set boundary limits with PCMD command, and updates state of the drone.
     self.pos_feedback()
     x=self.agent_pos[0]
     y=self.agent_pos[1]
@@ -134,6 +137,8 @@ class ParrotEnv(gym.Env):
     y_act = action[0]
     x_act = action[1]
     z_act = action[2]
+
+    # Define bounded action
     if x>5.0:
       x_act = min(0,action[1])
     if y<-5.0:
@@ -146,59 +151,50 @@ class ParrotEnv(gym.Env):
       z_act = max(0,action[2])
     if z>5:
       z_act = min(0,action[2])
+
     self.drone(PCMD(1, y_act, x_act, 0, z_act, timestampAndSeqNum=0, _timeout=10)>> FlyingStateChanged(state="hovering", _timeout=5)).wait()
-    #self.drone.piloting_pcmd(y_act,x_act,0,z_act,0)
-
-
-    #Terminating Condition
-    self.pos_feedback()
+    
+  
+    self.pos_feedback() # Update state of the drone in self.agent_pos
     obs = [self.agent_pos[0]-self.destination[0],self.agent_pos[1]-self.destination[1],self.agent_pos[2]-self.destination[2]]
     d = self.distance([obs[0],obs[1],obs[2]])
-    #dtheta = math.atan(obs[1]/(obs[0]+1e-5))
-    #dv = self.distance([obs[2],obs[3]])
-    #dvtheta = math.atan(obs[3]/(obs[2]+1e-5))
+
+    #Terminating Condition
     done = bool(d < 0.5)
     if bool(d < 0.5):
-      reward = +100
-    #elif bool(d > 10):
-    #  reward = -100
+      reward = +100   
     else:
       reward = -1*(d)
-    print('-----------------STEPS------------------------',self.counter,'------------------------STEPS---------------------------')
-    #print('------------------theta-----------------------',(dtheta-dvtheta),'---------------------theta-------------------------------------------')
-    print('-------------------REWARD----------------------',reward,'-----------------------REWARD---------------------')
+    print('------------STEPS-------------',self.counter,'------------STEPS-------------')
+    print('------------REWARD----------',reward,'------------REWARD----------')
 
     info = {}
-    #plt.ion()
+
     self.counter += 1
     row = [self.counter,reward]
     with    open('reward.csv', 'a', newline='') as csvFile:
              writer = csv.writer(csvFile)
              writer.writerow(row)
              csvFile.close()
-    #plt.scatter(self.counter, reward)
-    #plt.pause(0.1)
-    #plt.show()
-    #self.pos_feedback()
-    #obs = [self.agen_pos[0]-self.destination[0],self.agen_pos[1]-self.destination[1]]
-    print('----------------------pos---------------------',self.agent_pos,'-------------------------pos-------------------------')
+    print('------------STATE-------------',self.agent_pos,'------------STATE-------------')
     return np.array(obs).astype(np.float32), reward, done, info
 
   def render(self, mode='console'):
-    print("--------------------------CurrentPosition:------------------------",self.agent_pos)
+    print('------------STATE-------------',self.agent_pos,'------------STATE-------------')
 
   def close (self):
     pass
 
-#drone = olympe.Drone("10.202.0.1")
-#drone.connection()
-#assert drone(TakeOff()>> FlyingStateChanged(state="hovering", _timeout=5)).wait().success()
 
-#env = ParrotEnv(destination = [0,0], drone=drone)
-
-#print(env.observation_space)
-#print(env.action_space)
-#print('=============================================Check==================================================', check_env(env))
-
-#assert drone(Landing()).wait().success()
-#drone.disconnection()
+### Uncomment below lines to inspect check_env(env) after you modify the environment ###
+'''
+drone = olympe.Drone("10.202.0.1")
+drone.connection()
+assert drone(TakeOff()>> FlyingStateChanged(state="hovering", _timeout=5)).wait().success()
+env = ParrotEnv(destination = [0,0,1], drone=drone)
+print(env.observation_space)
+print(env.action_space)
+print('=============================================Check==================================================', check_env(env))
+assert drone(Landing()).wait().success()
+drone.disconnection()
+'''
